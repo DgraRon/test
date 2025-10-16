@@ -1,0 +1,300 @@
+﻿@page
+@model ServiceCatalogBGC_V2.Areas.Identity.Pages.Account.LoginModel
+@{
+    Layout = null; // ไม่ใช้ _Layout เฉพาะหน้านี้
+    ViewData["Title"] = "Login";
+    var returnUrl = Model.ReturnUrl ?? Url.Content("~/");
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - Service Catalog BGC</title>
+
+    <!-- ใช้ Bootstrap + Icons จาก CDN เพราะเราไม่ใช้ _Layout -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+
+    <style>
+        :root {
+            --card-w: 420px;
+            /* Light theme tokens */
+            --bg-light-1: linear-gradient(#f8fafc, #f6f7fb);
+            --text-strong-light: #0f172a;
+            --text-body-light: #111827;
+            --text-sub-light: #475569;
+            --label-light: #374151;
+            --field-bd-light: #d1d5db;
+            /* Dark theme tokens */
+            --bg-dark-1: linear-gradient(180deg, #0e1426, #121a2e);
+            --text-strong-dark: #ffffff;
+            --text-body-dark: #e5e7eb;
+            --text-sub-dark: #cbd5e1;
+            --label-dark: #d1d5db;
+            --field-bd-dark: #3b475d;
+        }
+
+        /* ============ Light Mode (default) ============ */
+        body {
+            min-height: 100vh;
+            margin: 0;
+            display: grid;
+            place-items: center;
+            background: var(--bg-light-1);
+            color: var(--text-body-light);
+        }
+
+        .login-wrap {
+            width: 100%;
+            padding: 24px;
+            display: grid;
+            justify-items: center;
+            row-gap: 18px;
+        }
+
+        .brand {
+            text-align: center;
+        }
+
+        .brand-title {
+            font-size: clamp(22px, 3vw, 32px);
+            font-weight: 800;
+            letter-spacing: .2px;
+            color: var(--text-strong-light);
+        }
+
+        .brand-sub {
+            color: var(--text-sub-light);
+            font-size: .95rem;
+            margin-top: 6px;
+        }
+
+        .login-card {
+            width: min(100%, var(--card-w));
+            background: #fff;
+            border: 1px solid rgba(0,0,0,.08);
+            border-radius: 18px;
+            box-shadow: 0 10px 30px rgba(0,0,0,.12);
+            color: var(--text-body-light);
+        }
+
+        .form-floating > .form-control {
+            background: #fff;
+            color: var(--text-body-light);
+            border-color: var(--field-bd-light);
+            border-radius: .8rem;
+        }
+
+        .form-floating > label {
+            color: var(--label-light);
+        }
+
+        .form-control::placeholder {
+            color: #6b7280;
+        }
+
+        .form-control:focus {
+            border-color: #60a5fa;
+            box-shadow: 0 0 0 .2rem rgba(96,165,250,.15);
+        }
+
+        .toggle-pass {
+            position: absolute;
+            right: .5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            border-radius: 999px;
+            padding: .3rem .5rem;
+        }
+
+        .btn-primary {
+            border-radius: .8rem;
+        }
+
+        /* ปุ่ม toggle theme */
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1000;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #ffffff;
+            color: #0f172a;
+            border: 1px solid rgba(0,0,0,.08);
+            box-shadow: 0 6px 18px rgba(0,0,0,.12);
+        }
+
+            .theme-toggle:hover {
+                filter: brightness(.98);
+            }
+
+        /* ============ Dark Mode (บังคับด้วย class) ============ */
+        body.dark-mode {
+            background: var(--bg-dark-1);
+            color: var(--text-body-dark);
+        }
+
+            body.dark-mode .brand-title {
+                color: var(--text-strong-dark);
+            }
+
+            body.dark-mode .brand-sub {
+                color: var(--text-sub-dark);
+            }
+
+            body.dark-mode .login-card {
+                background: rgba(255,255,255,.05);
+                border: 1px solid rgba(255,255,255,.10);
+                color: var(--text-body-dark);
+                box-shadow: 0 10px 30px rgba(0,0,0,.35);
+            }
+
+            body.dark-mode .form-floating > .form-control {
+                background: #0f172a;
+                color: var(--text-body-dark);
+                border-color: var(--field-bd-dark);
+            }
+
+            body.dark-mode .form-floating > label {
+                color: var(--label-dark);
+            }
+
+            body.dark-mode .form-control::placeholder {
+                color: #b6c2d1;
+            }
+
+            body.dark-mode .theme-toggle {
+                background: rgba(255,255,255,.08);
+                color: #facc15;
+                border-color: rgba(255,255,255,.2);
+                box-shadow: 0 6px 18px rgba(0,0,0,.4);
+            }
+
+        /* ซ่อน placeholder ใน form-floating กันทับกับ label */
+        .form-floating > .form-control::placeholder {
+            color: transparent !important;
+        }
+
+        .form-floating > .form-control:focus::placeholder {
+            color: transparent !important;
+        }
+
+        .form-floating > .form-control:-ms-input-placeholder {
+            color: transparent !important;
+        }
+        /* IE/Edge legacy */
+
+        /* เปลี่ยนสีข้อความที่ใช้ .text-muted เฉพาะในการ์ด */
+        .login-card .text-muted {
+            color: #181827 !important;
+        }
+        /* โหมดสว่าง */
+
+        body.dark-mode .login-card .text-muted {
+            color: #a7b0bf !important;
+        }
+        /* โหมดมืด */
+
+
+    </style>
+</head>
+<body>
+    <!-- ปุ่มสลับธีม -->
+    <button class="theme-toggle" id="themeToggle" type="button" title="Toggle theme">🌙</button>
+
+    <main class="login-wrap">
+        <!-- ชื่อเว็บ -->
+        <header class="brand">
+            <div class="brand-title">Service Catalog BGC</div>
+            <div class="brand-sub">ระบบจัดการบริการภายในองค์กร</div>
+        </header>
+    
+        <!-- การ์ดฟอร์ม -->
+        <section class="login-card card">
+            <div class="card-body p-4 p-md-5">
+                @* <h1 class="h5 fw-semibold text-center mb-1">login</h1>
+                <p class="text-center text-muted small mb-4">Please log in to proceed</p> *@
+
+                <form method="post" asp-route-returnUrl="@returnUrl" novalidate>
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger small" role="alert"></div>
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="Input.Email" class="form-control" autocomplete="username" placeholder="name@example.com" />
+                        <label asp-for="Input.Email"></label>
+                        <span asp-validation-for="Input.Email" class="text-warning small"></span>
+                    </div>
+
+                    <div class="form-floating mb-2 position-relative">
+                        <input asp-for="Input.Password" class="form-control" autocomplete="current-password" placeholder="••••••••" id="password" />
+                        <label asp-for="Input.Password"></label>
+                        <button type="button" class="btn btn-sm btn-outline-secondary toggle-pass" aria-label="Show password">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        <span asp-validation-for="Input.Password" class="text-warning small"></span>
+                    </div>
+
+                    @* <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="form-check">
+                            <input class="form-check-input" asp-for="Input.RememberMe" />
+                            <label class="form-check-label" asp-for="Input.RememberMe"></label>
+                        </div>
+                    </div> *@
+
+                    <button type="submit" class="btn btn-primary w-100 py-2">Log in</button>
+
+                    <div class="text-center mt-4 small text-muted">
+                        © @DateTime.UtcNow.Year Service Catalog BGC
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <!-- JS เฉพาะที่จำเป็น -->
+    <script>
+        // Toggle password
+        document.addEventListener('DOMContentLoaded', function () {
+          const btn = document.querySelector('.toggle-pass');
+          const pass = document.getElementById('password');
+          if (btn && pass){
+            btn.addEventListener('click', function(){
+              const show = pass.type === 'password';
+              pass.type = show ? 'text' : 'password';
+              this.innerHTML = show ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
+              this.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+            });
+          }
+        });
+
+        // Theme toggle (with localStorage)
+        (function(){
+          const key = 'theme'; // 'dark' | 'light'
+          const body = document.body;
+          const btn  = document.getElementById('themeToggle');
+
+          // init
+          const saved = localStorage.getItem(key);
+          if (saved === 'dark') {
+            body.classList.add('dark-mode');
+            btn.textContent = '🌞';
+          } else {
+            btn.textContent = '🌙';
+          }
+
+          btn.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            btn.textContent = isDark ? '🌞' : '🌙';
+            localStorage.setItem(key, isDark ? 'dark' : 'light');
+          });
+        })();
+    </script>
+</body>
+</html>

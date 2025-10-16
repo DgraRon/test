@@ -1,0 +1,79 @@
+﻿@model ServiceCatalogBGC_V2.Models.Category
+@using System
+
+@{
+    var actionName = (ViewContext.RouteData.Values["action"]?.ToString() ?? "");
+    var isEdit = actionName.Equals("Edit", StringComparison.OrdinalIgnoreCase);
+    ViewData["Title"] = isEdit ? "Edit Category" : "Add Category";
+    var backUrl = (string?)ViewBag.ReturnUrl ?? Url.Action("Create", "Catalog");
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8 col-12">
+        <div class="card shadow-sm">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <div>
+                    <h5 class="mb-0">@ViewData["Title"]</h5>
+                    <small class="text-muted">
+                        @(isEdit ? "แก้ไขหมวดหมู่สำหรับเลือกใน Catalog" : "เพิ่มหมวดหมู่สำหรับเลือกใน Catalog")
+                    </small>
+                </div>
+                <a asp-action="Index" class="btn btn-sm btn-outline-secondary">Category List</a>
+            </div>
+
+            <div class="card-body">
+                <form method="post"
+                      asp-action="@(isEdit ? "Edit" : "Create")"
+                      asp-route-returnUrl="@backUrl"
+                      class="needs-validation" novalidate>
+                    @Html.AntiForgeryToken()
+                    @if (isEdit)
+                    {
+                        <input type="hidden" asp-for="Id" />
+                    }
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger d-none"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label">Category name <span class="text-danger">*</span></label>
+                        <input asp-for="Name" class="form-control" maxlength="100" autofocus />
+                        <span asp-validation-for="Name" class="invalid-feedback d-block"></span>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" id="btnSave" class="btn btn-primary">
+                            @(isEdit ? "Save changes" : "Save")
+                        </button>
+                        <a href="@backUrl" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+          'use strict';
+          const form = document.querySelector('form.needs-validation');
+          const btn  = document.getElementById('btnSave');
+          if (!form) return;
+
+          const hasServerErrors = document.querySelector('[data-valmsg-summary="true"] ul li');
+          if (hasServerErrors) {
+            document.querySelector('[data-valmsg-summary="true"]')?.classList.remove('d-none');
+          }
+
+          form.addEventListener('submit', function (e) {
+            if (!form.checkValidity()) {
+              e.preventDefault(); e.stopPropagation();
+            } else {
+              btn?.setAttribute('disabled','disabled'); btn?.classList.add('disabled');
+            }
+            form.classList.add('was-validated');
+          }, false);
+        })();
+    </script>
+}

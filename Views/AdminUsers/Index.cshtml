@@ -1,0 +1,170 @@
+﻿@model IEnumerable<ServiceCatalogBGC_V2.ViewModels.AdminUsers.UserRowVM>
+
+@{
+    ViewData["Title"] = "Users";
+    var includeDisabled = (bool)(ViewBag.IncludeDisabled ?? false);
+
+    // อีเมลผู้ใช้ปัจจุบัน (ไว้กันไม่ให้ปิดตัวเอง)
+    var me = (User?.Identity?.Name ?? "").Trim();
+}
+
+<div class="d-flex align-items-center mb-3">
+    <h4 class="mb-0 me-auto">Users</h4>
+
+    <a asp-action="Index"
+       asp-route-includeDisabled="@(!includeDisabled)"
+       class="btn btn-outline-secondary btn-sm">
+        @(includeDisabled ? "Hide disabled" : "Show disabled")
+    </a>
+
+    <a asp-controller="AdminUsers" asp-action="Create" class="btn btn-primary ms-2">
+        Add User
+    </a>
+</div>
+
+<table class="table table-sm align-middle">
+    <thead>
+        <tr>
+            <th>Email</th>
+            <th>Roles</th>
+            <th>Status</th>
+            <th style="width:260px">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var u in Model)
+        {
+            // ห้ามแก้อะไรกับ SuperAdmin และห้ามปิดผู้ใช้ตัวเอง
+            var isMe = string.Equals(u.Email?.Trim(), me, StringComparison.OrdinalIgnoreCase);
+            var canChangeRole = !u.IsSuperAdmin;             // SuperAdmin ห้ามเปลี่ยนสิทธิ
+            var canDisable = !u.IsSuperAdmin && !isMe;    // SuperAdmin/ตัวเอง ห้ามโดนปิด
+
+            <tr class="@(u.IsDisabled ? "table-warning" : "")">
+                <td>
+                    @u.Email
+                    @if (u.IsSuperAdmin)
+                    {
+                        <span class="badge bg-dark ms-2">SuperAdmin</span>
+                    }
+                    else if (isMe)
+                    {
+                        <span class="badge bg-info text-dark ms-2">You</span>
+                    }
+                </td>
+                <td>@u.Roles</td>
+                <td>
+                    @if (u.IsDisabled)
+                    {
+                        <span class="badge bg-warning text-dark">Disabled</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-success">Active</span>
+                    }
+                </td>
+                <td class="text-nowrap">
+                    @if (canChangeRole)
+                    {
+                        <div class="btn-group me-1">
+                            <button type="button" class="btn btn-outline-primary btn-sm dropdown-toggle"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                Change role
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <form asp-action="MakeAdmin" asp-controller="AdminUsers" method="post"
+                                          onsubmit="return confirm('ยืนยันเลื่อน @u.Email เป็น Admin ?');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@u.Id" />
+                                        <button type="submit" class="dropdown-item">Make Admin</button>
+                                    </form>
+                                </li>
+                                <li>
+                                    <form asp-action="MakeUser" asp-controller="AdminUsers" method="post"
+                                          onsubmit="return confirm('ยืนยันลดสิทธิ์ @u.Email เป็น User ?');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@u.Id" />
+                                        <button type="submit" class="dropdown-item">Make User</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <authorize policy="SuperAdminOnly">
+                            <button type="button" class="btn btn-outline-warning btn-sm"
+                                    data-bs-toggle="modal" data-bs-target="#setPwdModal-@u.Id">
+                                Set password
+                            </button>
+
+                            <div class="modal fade" id="setPwdModal-@u.Id" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <form asp-action="SetPasswordDirect" asp-controller="AdminUsers" method="post" class="modal-content"
+                                          onsubmit="return confirm('ยืนยันตั้งรหัสใหม่ให้ @u.Email ? ผู้ใช้จะถูกบังคับให้ออกจากระบบทันที');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="Id" value="@u.Id" />
+
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">ตั้งรหัสใหม่: @u.Email</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+
+                                        <div class="modal-body">
+                                            <div class="mb-3">
+                                                <label class="form-label">New password</label>
+                                                <input name="NewPassword" type="password" class="form-control" autocomplete="new-password" required />
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Confirm new password</label>
+                                                <input name="ConfirmPassword" type="password" class="form-control" autocomplete="new-password" required />
+                                            </div>
+                                            <div class="alert alert-warning small mb-0">
+                                                ระบบจะอัปเดต SecurityStamp เพื่อตัดทุก session เดิม และบันทึก audit log
+                                            </div>
+                                        </div>
+
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            <button type="submit" class="btn btn-warning">Set password</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </authorize>
+
+                    }
+                    else
+                    {
+                        <span class="text-muted">—</span>
+                    }
+
+                    @{
+                        bool showDisabled = (bool?)ViewBag.IncludeDisabled ?? false;
+                    }
+
+
+                    @if (!u.IsDisabled && canDisable)
+                    {
+                        <form asp-action="Disable" method="post" class="d-inline ms-1"
+                              asp-route-id="@u.Id"
+                              asp-route-includeDisabled="@showDisabled"
+                              onsubmit="return confirm('Disable @u.Email ?');">
+                            @Html.AntiForgeryToken()
+                            <button class="btn btn-sm btn-danger">Disable</button>
+                        </form>
+                    }
+                    else if (u.IsDisabled)
+                    {
+                        <form asp-action="Restore" method="post" class="d-inline ms-1"
+                              asp-route-id="@u.Id"
+                              asp-route-includeDisabled="@showDisabled">
+                            @Html.AntiForgeryToken()
+                            <button class="btn btn-sm btn-success">Restore</button>
+                        </form>
+                    }
+
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,881 @@
+﻿@model ServiceCatalogBGC_V2.ViewModels.Catalogs.CatalogEditVM
+@using AuthSystem
+@{
+    ViewData["Title"] = "Create Catalog";
+    var returnUrl = Url.Action("Create", "Catalog");
+    var isAdmin = User.IsInRole(AppRoles.Admin);
+}
+
+<div class="row justify-content-center mt-4">
+    <div class="col-12 col-xl-10">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Create Service</h4>
+            </div>
+
+            <form asp-action="Create" method="post" novalidate>
+                @Html.AntiForgeryToken()
+
+                <div class="card-body">
+
+                    <!-- Error summary -->
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger d-none" role="alert"></div>
+
+                    <!-- ================= General ================= -->
+                    <div class="mb-4">
+                        <div class="d-flex align-items-center mb-2">
+                            <h5 class="mb-0">General</h5>
+                            <hr class="flex-grow-1 ms-3">
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="SystemName" class="form-label fw-semibold">Name</label>
+                                <input asp-for="SystemName" class="form-control" autocomplete="off" placeholder="Enter catalog name">
+                                <span asp-validation-for="SystemName" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="TypeId" class="form-label fw-semibold">Type</label>
+                                <div class="input-group">
+                                    <select id="ServiceTypeId" asp-for="TypeId" class="form-select" asp-items="ViewBag.ServiceTypeId">
+                                        <option value="">-- กรุณาเลือก --</option>
+                                    </select>
+                                    <authorize policy="AdminOnly">
+                                        <button type="button" class="btn btn-outline-primary"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#typeModal">
+                                            <i class="bi bi-plus-lg me-1"></i>Add Type
+                                        </button>
+                                    </authorize>
+                                </div>
+                                <span asp-validation-for="TypeId" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-12">
+                                <label asp-for="Description" class="form-label fw-semibold">Description</label>
+                                <textarea asp-for="Description" rows="3" class="form-control" placeholder="Enter description"></textarea>
+                                <span asp-validation-for="Description" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ================= Classification ================= -->
+                    <div class="mb-4">
+                        <div class="d-flex align-items-center mb-2">
+                            <h5 class="mb-0">Classification</h5>
+                            <hr class="flex-grow-1 ms-3">
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="CategoryId" class="form-label fw-semibold">Category</label>
+                                <div class="input-group">
+                                    <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.CategoryId">
+                                        <option value="">-- กรุณาเลือก --</option>
+                                    </select>
+                                    <authorize policy="AdminOnly">
+                                        <button type="button"
+                                                class="btn btn-outline-primary"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#categoryModal">
+                                            <i class="bi bi-plus-lg me-1"></i>Add Category
+                                        </button>
+                                    </authorize>
+                                </div>
+                                <span asp-validation-for="CategoryId" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="StatusId" class="form-label fw-semibold">Status</label>
+                                <div class="input-group">
+                                    <select asp-for="StatusId" class="form-select" asp-items="ViewBag.StatusId">
+                                        <option value="">-- กรุณาเลือก --</option>
+                                    </select>
+                                    <authorize policy="AdminOnly">
+                                        <button type="button" class="btn btn-outline-primary"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#statusModal"
+                                                onclick="openStatusModal('create')">
+                                            <i class="bi bi-plus-lg me-1"></i> Add Status
+                                        </button>
+                                    </authorize>
+                                </div>
+                                <span asp-validation-for="StatusId" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="PriorityId" class="form-label fw-semibold">Priority</label>
+                                <div class="input-group">
+                                    <select asp-for="PriorityId" class="form-select" asp-items="ViewBag.PriorityId">
+                                        <option value="">-- กรุณาเลือก --</option>
+                                    </select>
+                                    <authorize policy="AdminOnly">
+                                        <button type="button"
+                                                class="btn btn-outline-primary"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#priorityModal">
+                                            <i class="bi bi-plus-lg me-1"></i> Add Priority
+                                        </button>
+                                    </authorize>
+                                </div>
+                                <span asp-validation-for="PriorityId" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="DeploymentTypeId" class="form-label fw-semibold">Deployment Type</label>
+                                <div class="input-group">
+                                    <select asp-for="DeploymentTypeId" class="form-select" asp-items="ViewBag.DeploymentTypeId">
+                                        <option value="">-- กรุณาเลือก --</option>
+                                    </select>
+                                    <authorize policy="AdminOnly">
+                                        <button type="button"
+                                                class="btn btn-outline-primary"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#deploymentTypeModal">
+                                            <i class="bi bi-plus-lg me-1"></i> Add Deployment Type
+                                        </button>
+                                    </authorize>
+                                </div>
+                                <span asp-validation-for="DeploymentTypeId" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+                        
+                    <!-- ================= Timeline & Location ================= -->
+                    <div class="mb-4">
+                        <div class="d-flex align-items-center mb-2">
+                            <h5 class="mb-0">Timeline & Location</h5>
+                            <hr class="flex-grow-1 ms-3">
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="ReleasedDate" class="form-label fw-semibold">Released date</label>
+                                <input asp-for="ReleasedDate" type="date" class="form-control">
+                                <span asp-validation-for="ReleasedDate" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="ReleasedMark" class="form-label fw-semibold">Released mark</label>
+                                <input asp-for="ReleasedMark" class="form-control" placeholder="เช่น Q1 2025">
+                                <span asp-validation-for="ReleasedMark" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="LastUpdate" class="form-label fw-semibold">Last Update</label>
+                                <input asp-for="LastUpdate" type="date" class="form-control">
+                                <span asp-validation-for="LastUpdate" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Location" class="form-label fw-semibold">Plant/Location</label>
+                                <input asp-for="Location" class="form-control" placeholder="Plant/Location">
+                                <span asp-validation-for="Location" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ================= Connectivity ================= -->
+                    <div class="mb-4">
+                        <div class="d-flex align-items-center mb-2">
+                            <h5 class="mb-0">Connectivity</h5>
+                            <hr class="flex-grow-1 ms-3">
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="SURL" class="form-label fw-semibold">System URL</label>
+                                <input asp-for="SURL" class="form-control" placeholder="System URL">
+                                <span asp-validation-for="SURL" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Ip" class="form-label fw-semibold">IP/HostName</label>
+                                <input asp-for="Ip" class="form-control" placeholder="IP/HostName">
+                                <span asp-validation-for="Ip" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="DEndpoint" class="form-label fw-semibold">Database Endpoint</label>
+                                <input asp-for="DEndpoint" class="form-control" placeholder="Database Endpoint">
+                                <span asp-validation-for="DEndpoint" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ================= People (Developers) ================= -->
+                    <div class="mb-4">
+                        <div class="d-flex align-items-center mb-2">
+                            <h5 class="mb-0">People</h5>
+                            <hr class="flex-grow-1 ms-3">
+
+                        </div>
+                           
+        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Functional/SA (เลือกได้หลายคน)</label>
+                                <select id="FunctionalSaIds"
+                                        name="FunctionalSaIds"
+                                        asp-for="FunctionalSaIds"
+                                        asp-items="Model.FunctionalSaOptions"
+                                        class="form-select js-people-select"
+                                        multiple style="width:100%">
+                                    </select>
+
+
+                            </div>
+
+                            <div class="col-md-6">
+                                <!-- แถวหัวคอลัมน์: ซ้าย label / ขวาปุ่ม -->
+                                <div class="row align-items-center mb-1">
+                                    <div class="col">
+                                        <label class="form-label fw-semibold mb-0">
+                                            Vendor/Developer (เลือกได้หลายคน)
+                                        </label>
+                                    </div>
+                                    <div class="col-auto text-end">
+                                        <authorize policy="AdminOnly">
+                                            <button type="button"
+                                                    class="btn btn-outline-primary btn-sm"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#developerModal">
+                                                <i class="bi bi-plus-lg me-1"></i>Add Email
+                                            </button>
+                                        </authorize>
+                                    </div>
+                                </div>
+
+                                <select id="VendorDevIds"
+                                        name="VendorDevIds"
+                                        asp-for="VendorDevIds"
+                                        asp-items="Model.VendorDevOptions"
+                                        class="form-select js-people-select"
+                                        multiple style="width:100%">
+                                </select>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <!-- ================= Ownership ================= -->
+                    <div>
+                        <div class="d-flex align-items-center mb-2">
+                            <h5 class="mb-0">Ownership</h5>
+                            <hr class="flex-grow-1 ms-3">
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="Bu" class="form-label fw-semibold">BU</label>
+                                <input asp-for="Bu" class="form-control" placeholder="BU">
+                                <span asp-validation-for="Bu" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Dept" class="form-label fw-semibold">Dept.</label>
+                                <input asp-for="Dept" class="form-control" placeholder="Dept.">
+                                <span asp-validation-for="Dept" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="BOwner" class="form-label fw-semibold">Business owner</label>
+                                <input asp-for="BOwner" class="form-control" placeholder="Business owner">
+                                <span asp-validation-for="BOwner" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="BUser" class="form-label fw-semibold">Business user</label>
+                                <input asp-for="BUser" class="form-control" placeholder="Business user">
+                                <span asp-validation-for="BUser" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="ITBP" class="form-label fw-semibold">IT BP/IT PM</label>
+                                <input asp-for="ITBP" class="form-control" placeholder="IT BP/IT PM">
+                                <span asp-validation-for="ITBP" class="text-danger small"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div><!-- /card-body -->
+                <!-- sticky footer actions -->
+                <div class="card-footer bg-light position-sticky bottom-0">
+                    <div class="d-flex justify-content-end gap-2">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left me-1"></i>Back
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-save me-1"></i>Save
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ===== Modal สำหรับ Add Type ===== -->
+<div class="modal fade" id="typeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Service Type</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="typeQuickForm">
+                <div class="modal-body">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-3">
+                        <label class="form-label">Type Name</label>
+                        <input id="TypeName" name="name" class="form-control" placeholder="e.g. Web App, API" />
+                        <div id="typeErr" class="text-danger small mt-2 d-none"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <!-- ปุ่มลิงก์ไปหน้า Service Type List -->
+                    <a asp-controller="ServiceType"
+                       asp-action="Index"
+                       class="btn btn-sm btn-outline-secondary"
+                       target="_blank">
+                        Service Type List
+                    </a>
+
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Close
+                    </button>
+
+                    <button type="submit" class="btn btn-primary">
+                        Save
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ===== Modal สำหรับ Add Category ===== -->
+<div class="modal fade" id="categoryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Category</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="categoryQuickForm">
+                <div class="modal-body">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-3">
+                        <label class="form-label">Category Name</label>
+                        <input id="CategoryName" name="name" class="form-control" placeholder="e.g. HR, Finance, IT" />
+                        <div id="categoryErr" class="text-danger small mt-2 d-none"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a asp-controller="Category"
+                       asp-action="Index"
+                       class="btn btn-sm btn-outline-secondary"
+                       target="_blank">
+                        Category List
+                    </a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ===== Modal สำหรับ Add Status ===== -->
+<div class="modal fade" id="statusModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Status</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form id="statusQuickForm">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Status Name</label>
+                        <input id="StatusName" name="name" class="form-control" placeholder="e.g. In Use, Deprecated">
+                        <div id="statusErr" class="text-danger small mt-2 d-none"></div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <a asp-controller="Status" asp-action="Index"
+                       class="btn btn-sm btn-outline-secondary" target="_blank">
+                        Status List
+                    </a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ===== Modal สำหรับ Add Priority ===== -->
+<div class="modal fade" id="priorityModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Priority</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form id="priorityQuickForm">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Priority Name</label>
+                        <input id="PriorityName" name="name" class="form-control" placeholder="e.g. High, Medium, Low" />
+                        <div id="priorityErr" class="text-danger small mt-2 d-none"></div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <a asp-controller="Priority" asp-action="Index"
+                       class="btn btn-sm btn-outline-secondary" target="_blank">
+                        Priority List
+                    </a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ===== Modal สำหรับ Add Deployment Type ===== -->
+<div class="modal fade" id="deploymentTypeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Deployment Type</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form id="deploymentTypeQuickForm">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Deployment Type Name</label>
+                        <input id="DeploymentTypeName" name="name" class="form-control" placeholder="e.g. On-Prem, Cloud, Hybrid" />
+                        <div id="deploymentTypeErr" class="text-danger small mt-2 d-none"></div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <a asp-controller="DeploymentType" asp-action="Index"
+                       class="btn btn-sm btn-outline-secondary" target="_blank">
+                        Deployment Type List
+                    </a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ===== Modal สำหรับ Add Developer/Email ===== -->
+<div class="modal fade" id="developerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Email</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="developerQuickForm">
+                <div class="modal-body">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input id="DeveloperEmail" name="email" type="email" class="form-control" placeholder="someone@example.com" />
+                        <div id="developerErr" class="text-danger small mt-2 d-none"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Name (optional)</label>
+                        <input id="DeveloperName" name="name" class="form-control" placeholder="Display name" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a asp-controller="Developers"
+                       asp-action="Index"
+                       class="btn btn-sm btn-outline-secondary"
+                       target="_blank">
+                        Developer List
+                    </a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(function () {
+            const $summary = $('[data-valmsg-summary="true"]');
+            if ($summary.length && $summary.find('ul li').length) $summary.removeClass('d-none');
+
+            $('select.js-people-select').each(function () {
+                const $el = $(this);
+                if ($el.hasClass('select2-hidden-accessible')) return;
+                if ($el.find('option[value=""]').length === 0) {
+                    $el.prepend('<option value=""></option>');
+                }
+                $el.select2({
+                    theme: 'bootstrap-5',
+                    width: '100%',
+                    placeholder: $el.attr('placeholder') || 'พิมพ์เพื่อค้นหา...',
+                    allowClear: true,
+                    closeOnSelect: false
+                });
+                $el.on('change.select2', function () { $(this).valid(); });
+            });
+        });
+
+        // ===== Function ดึง Token =====
+        function getToken(){
+            // ใช้ Token ของฟอร์มแรกเจอใน DOM
+            return document.querySelector('input[name="__RequestVerificationToken"]').value;
+        }
+
+        // ===== AJAX Save Type =====
+        document.getElementById('typeQuickForm').addEventListener('submit', async function(e){
+            e.preventDefault();
+            const name = document.getElementById('TypeName').value.trim();
+            const err = document.getElementById('typeErr');
+            err.classList.add('d-none');
+            err.textContent = '';
+
+            if(!name){
+                err.textContent = 'กรุณากรอกชื่อ Service Type';
+                err.classList.remove('d-none');
+                return;
+            }
+
+            const form = new FormData();
+            form.append('name', name);
+
+            const res = await fetch('@Url.Action("CreateQuick", "ServiceType")', {
+                method: 'POST',
+                headers: { 'RequestVerificationToken': getToken() },
+                body: form
+            });
+
+            if(!res.ok){
+                const msg = (await res.json()).message || 'เกิดข้อผิดพลาด';
+                err.textContent = msg;
+                err.classList.remove('d-none');
+                return;
+            }
+
+            const data = await res.json();
+            const sel = document.getElementById('ServiceTypeId');
+
+            if($(sel).data('select2')){
+                const newOption = new Option(data.name, data.id, true, true);
+                $(sel).append(newOption).trigger('change');
+            } else {
+                let opt = sel.querySelector(`option[value="${data.id}"]`);
+                if(!opt){
+                    opt = document.createElement('option');
+                    opt.value = data.id;
+                    opt.text = data.name;
+                    sel.appendChild(opt);
+                }
+                sel.value = String(data.id);
+            }
+
+            bootstrap.Modal.getInstance(document.getElementById('typeModal')).hide();
+            document.getElementById('TypeName').value = '';
+        });
+
+        // ===== AJAX Save Category =====
+        document.getElementById('categoryQuickForm').addEventListener('submit', async function(e){
+            e.preventDefault();
+
+            const name = document.getElementById('CategoryName').value.trim();
+            const err = document.getElementById('categoryErr');
+            err.classList.add('d-none');
+            err.textContent = '';
+
+            if(!name){
+                err.textContent = 'กรุณากรอกชื่อ Category';
+                err.classList.remove('d-none');
+                return;
+            }
+
+            const form = new FormData();
+            form.append('name', name);
+
+            const res = await fetch('@Url.Action("CreateQuick", "Category")', {
+                method: 'POST',
+                headers: { 'RequestVerificationToken': getToken() },
+                body: form
+            });
+
+            if(!res.ok){
+                const msg = (await res.json()).message || 'เกิดข้อผิดพลาด';
+                err.textContent = msg;
+                err.classList.remove('d-none');
+                return;
+            }
+
+            const data = await res.json();
+            const sel = document.getElementById('CategoryId');
+
+            if($(sel).data('select2')){
+                const newOption = new Option(data.name, data.id, true, true);
+                $(sel).append(newOption).trigger('change');
+            } else {
+                let opt = sel.querySelector(`option[value="${data.id}"]`);
+                if(!opt){
+                    opt = document.createElement('option');
+                    opt.value = data.id;
+                    opt.text = data.name;
+                    sel.appendChild(opt);
+                }
+                sel.value = String(data.id);
+            }
+
+            bootstrap.Modal.getInstance(document.getElementById('categoryModal')).hide();
+            document.getElementById('CategoryName').value = '';
+        });
+
+        // ===== AJAX Save Status =====
+        document.getElementById('statusQuickForm').addEventListener('submit', async function(e){
+            e.preventDefault();
+
+            const name = document.getElementById('StatusName').value.trim();
+            const err = document.getElementById('statusErr');
+            err.classList.add('d-none');
+            err.textContent = '';
+
+            if(!name){
+                err.textContent = 'กรุณากรอกชื่อ Status';
+                err.classList.remove('d-none');
+                return;
+            }
+
+            const form = new FormData();
+            form.append('name', name);
+
+            const res = await fetch('@Url.Action("CreateQuick", "Status")', {
+                method: 'POST',
+                headers: { 'RequestVerificationToken': getToken() },
+                body: form
+            });
+
+            if(!res.ok){
+                const msg = (await res.json()).message || 'เกิดข้อผิดพลาด';
+                err.textContent = msg;
+                err.classList.remove('d-none');
+                return;
+            }
+
+            const data = await res.json();
+            const sel = document.getElementById('StatusId');
+
+            if($(sel).data('select2')){
+                const newOption = new Option(data.name, data.id, true, true);
+                $(sel).append(newOption).trigger('change');
+            } else {
+                let opt = sel.querySelector(`option[value="${data.id}"]`);
+                if(!opt){
+                    opt = document.createElement('option');
+                    opt.value = data.id;
+                    opt.text = data.name;
+                    sel.appendChild(opt);
+                }
+                sel.value = String(data.id);
+            }
+
+            bootstrap.Modal.getInstance(document.getElementById('statusModal')).hide();
+            document.getElementById('StatusName').value = '';
+        });
+
+        // ===== AJAX Save Priority =====
+        document.getElementById('priorityQuickForm').addEventListener('submit', async function(e){
+          e.preventDefault();
+
+          const name = document.getElementById('PriorityName').value.trim();
+          const err  = document.getElementById('priorityErr');
+          err.classList.add('d-none'); err.textContent = '';
+
+          if(!name){
+            err.textContent = 'กรุณากรอกชื่อ Priority';
+            err.classList.remove('d-none');
+            return;
+          }
+
+          const form = new FormData();
+          form.append('name', name);
+
+          const res = await fetch('@Url.Action("CreateQuick", "Priority")', {
+            method: 'POST',
+            headers: { 'RequestVerificationToken': getToken() },
+            body: form
+          });
+
+          if(!res.ok){
+            const msg = (await res.json()).message || 'เกิดข้อผิดพลาด';
+            err.textContent = msg;
+            err.classList.remove('d-none');
+            return;
+          }
+
+          const data = await res.json();
+          const sel  = document.getElementById('PriorityId');
+
+          if($(sel).data('select2')){
+            const newOption = new Option(data.name, data.id, true, true);
+            $(sel).append(newOption).trigger('change');
+          } else {
+            let opt = sel.querySelector(`option[value="${data.id}"]`);
+            if(!opt){
+              opt = document.createElement('option');
+              opt.value = data.id;
+              opt.text  = data.name;
+              sel.appendChild(opt);
+            }
+            sel.value = String(data.id);
+          }
+
+          bootstrap.Modal.getInstance(document.getElementById('priorityModal')).hide();
+          document.getElementById('PriorityName').value = '';
+        });
+
+        // ===== AJAX Save Deployment Type =====
+        document.getElementById('deploymentTypeQuickForm').addEventListener('submit', async function(e){
+          e.preventDefault();
+
+          const name = document.getElementById('DeploymentTypeName').value.trim();
+          const err  = document.getElementById('deploymentTypeErr');
+          err.classList.add('d-none'); err.textContent = '';
+
+          if(!name){
+            err.textContent = 'กรุณากรอกชื่อ Deployment Type';
+            err.classList.remove('d-none');
+            return;
+          }
+
+          const form = new FormData();
+          form.append('name', name);
+
+          const res = await fetch('@Url.Action("CreateQuick", "DeploymentType")', {
+            method: 'POST',
+            headers: { 'RequestVerificationToken': getToken() },
+            body: form
+          });
+
+          if(!res.ok){
+            const msg = (await res.json()).message || 'เกิดข้อผิดพลาด';
+            err.textContent = msg;
+            err.classList.remove('d-none');
+            return;
+          }
+
+          const data = await res.json();
+          const sel  = document.getElementById('DeploymentTypeId');
+
+          if($(sel).data('select2')){
+            const newOption = new Option(data.name, data.id, true, true);
+            $(sel).append(newOption).trigger('change');
+          } else {
+            let opt = sel.querySelector(`option[value="${data.id}"]`);
+            if(!opt){
+              opt = document.createElement('option');
+              opt.value = data.id;
+              opt.text  = data.name;
+              sel.appendChild(opt);
+            }
+            sel.value = String(data.id);
+          }
+
+          bootstrap.Modal.getInstance(document.getElementById('deploymentTypeModal')).hide();
+          document.getElementById('DeploymentTypeName').value = '';
+        });
+
+            // ===== AJAX Save Developer =====
+        document.getElementById('developerQuickForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const email = document.getElementById('DeveloperEmail').value.trim();
+            const name = document.getElementById('DeveloperName').value.trim();
+            const err = document.getElementById('developerErr');
+            err.classList.add('d-none');
+            err.textContent = '';
+
+            if (!email) {
+                err.textContent = 'กรุณากรอกอีเมล';
+                err.classList.remove('d-none');
+                return;
+            }
+
+            const form = new FormData();
+            form.append('email', email);
+            form.append('name', name);
+
+            const res = await fetch('@Url.Action("CreateQuick", "Developers")', {
+                method: 'POST',
+                headers: { 'RequestVerificationToken': getToken() },
+                body: form
+            });
+
+            if (!res.ok) {
+                const msg = (await res.json()).message || 'เกิดข้อผิดพลาด';
+                err.textContent = msg;
+                err.classList.remove('d-none');
+                return;
+            }
+
+            const data = await res.json();
+            const sel = document.getElementById('DeveloperId'); // ID ของ <select> Developer
+
+            if ($(sel).data('select2')) {
+                const newOption = new Option(data.email, data.id, true, true);
+                $(sel).append(newOption).trigger('change');
+            } else {
+                let opt = sel.querySelector(`option[value="${data.id}"]`);
+                if (!opt) {
+                    opt = document.createElement('option');
+                    opt.value = data.id;
+                    opt.text = data.email;
+                    sel.appendChild(opt);
+                }
+                sel.value = String(data.id);
+            }
+
+            bootstrap.Modal.getInstance(document.getElementById('developerModal')).hide();
+            document.getElementById('DeveloperEmail').value = '';
+            document.getElementById('DeveloperName').value = '';
+        });
+
+
+
+    </script>
+}
+
+
+<style>
+    .card-header h4 {
+        letter-spacing: .2px
+    }
+
+    .form-label {
+        margin-bottom: .35rem
+    }
+
+    .card-footer {
+        z-index: 3
+    }
+</style>

@@ -1,0 +1,63 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Service Catalog BGC - Authentication</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body class="bg-light">
+
+    <header class="py-3 border-bottom bg-white">
+        <div class="container">
+            <h4 class="m-0 fw-semibold">Service Catalog BGC</h4>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-7 col-lg-5 mt-5">
+                <div class="card shadow-sm login-logout-card">
+                    <div class="card-header">
+                        <ul class="nav nav-tabs card-header-tabs">
+                            <li class="nav-item">
+                                <a class="nav-link" href="/Identity/Account/Login">Log In</a>
+                            </li>
+                            
+                        </ul>
+                    </div>
+                    <div class="card-body">
+                        <div class="row justify-content-center">
+                            <div class="col-10 my-4">
+                                @RenderBody()
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-center text-muted small mt-3 mb-0">© @DateTime.Now.Year ServiceCatalogBGC</p>
+            </div>
+        </div>
+    </main>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+        $(function () {
+            const currentPage = location.pathname.toLowerCase();
+            $('.nav-tabs li a').each(function () {
+                const $this = $(this);
+                if (currentPage.indexOf($this.attr('href').toLowerCase()) !== -1) {
+                    $this.addClass('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+﻿@model IEnumerable<ServiceCatalogBGC_V2.Models.DeploymentType>
+@{
+    ViewData["Title"] = "Deployment Type List";
+
+    var returnUrl = Context.Request.Query["returnUrl"].ToString();
+    if (string.IsNullOrWhiteSpace(returnUrl))
+    {
+        returnUrl = Url.Action("Create", "Catalog");
+    }
+}
+<div class="row">
+    <div class="col-lg-8 col-md-10 col-12 mx-auto">
+        <h2>@ViewData["Title"]</h2>
+
+        <div class="d-flex gap-2 mb-3">
+            <a asp-action="Create" asp-route-returnUrl="@returnUrl" class="btn btn-primary">Add New</a>
+            <a href="@returnUrl" class="btn btn-outline-secondary">← Back to Add Service</a>
+        </div>
+
+        <table class="table table-bordered">
+            <thead>
+                <tr><th>Name</th><th style="width:150px;"></th></tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Name</td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@item.Id" asp-route-returnUrl="@returnUrl" class="btn btn-warning btn-sm">Edit</a>
+                            <form asp-action="Delete" asp-route-id="@item.Id" asp-route-returnUrl="@returnUrl" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Delete @item.Name ?');">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

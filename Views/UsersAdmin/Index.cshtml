@@ -1,0 +1,42 @@
+﻿@* @model IEnumerable<UserListItemVM>
+@{
+    ViewData["Title"] = "Users";
+}
+<div class="d-flex align-items-center mb-3">
+    <h3 class="me-auto">Users</h3>
+    <a asp-action="Create" class="btn btn-primary">Add User</a>
+</div>
+
+<table class="table table-bordered align-middle">
+    <thead>
+        <tr>
+            <th>Email</th>
+            <th>Roles</th>
+            <th style="width:260px">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var u in Model)
+        {
+            <tr>
+                <td>@u.Email</td>
+                <td>@string.Join(", ", u.Roles)</td>
+                <td class="text-nowrap">
+                    <form asp-action="MakeAdmin" method="post" class="d-inline">
+                        <input type="hidden" name="id" value="@u.Id" />
+                        <button class="btn btn-sm btn-outline-dark">Make Admin</button>
+                    </form>
+                    <form asp-action="MakeUser" method="post" class="d-inline">
+                        <input type="hidden" name="id" value="@u.Id" />
+                        <button class="btn btn-sm btn-outline-secondary">Make User</button>
+                    </form>
+                    <form asp-action="Delete" method="post" class="d-inline"
+                          onsubmit="return confirm('Delete @u.Email ?');">
+                        <input type="hidden" name="id" value="@u.Id" />
+                        <button class="btn btn-sm btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table> *@

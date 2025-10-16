@@ -1,0 +1,347 @@
+﻿@* Views/Shared/_Layout.cshtml *@
+@using System.Security.Claims
+@using ServiceCatalogBGC_V2.Areas.Identity.Data
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser_> SignInManager
+@inject UserManager<ApplicationUser_> UserManager
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - Service Catalog BGC</title>
+
+    <!-- Google Fonts (Poppins) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+    <!-- Bootstrap base theme -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <!-- DataTables bundle -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/v/bs5/dt-2.1.5/r-3.0.2/b-3.0.2/b-colvis-3.0.2/datatables.min.css" />
+
+    <!-- Select2 (core) + Select2 Bootstrap 5 theme -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+
+    <!-- Project CSS -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <style>
+        :root {
+            --sidebar-width: 260px;
+            --sidebar-bg: #00529e; /* BG Primary Blue */
+            --sidebar-link-color: #e9ecef;
+            --sidebar-link-hover-bg: #00417e;
+            --sidebar-link-active-bg: #007bff; /* Highlight Blue */
+            --content-bg: #f4f7fc;
+            --header-height: 60px;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--content-bg);
+            font-size: 0.95rem;
+        }
+
+        .wrapper {
+            display: flex;
+            width: 100%;
+            align-items: flex-start;
+        }
+
+        /* --- Sidebar Styles --- */
+        #sidebar {
+            width: var(--sidebar-width);
+            min-width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            color: white;
+            transition: margin-left 0.35s ease-in-out;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+            #sidebar.collapsed {
+                margin-left: calc(-1 * var(--sidebar-width));
+            }
+
+            #sidebar .sidebar-header {
+                background: #00417e;
+                text-align: center;
+                height: var(--header-height);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0 1rem;
+            }
+
+                #sidebar .sidebar-header h3 {
+                    font-size: 1.5rem;
+                    margin-bottom: 0;
+                    color: #fff;
+                }
+
+            #sidebar ul.components {
+                padding: 20px 0;
+            }
+
+            #sidebar ul li a {
+                padding: 15px 20px;
+                font-size: 1.05em;
+                display: block;
+                color: var(--sidebar-link-color);
+                text-decoration: none;
+                transition: all 0.2s;
+            }
+
+                #sidebar ul li a:hover {
+                    color: #fff;
+                    background: var(--sidebar-link-hover-bg);
+                }
+
+            #sidebar ul li.active > a, a[aria-expanded="true"] {
+                color: #fff;
+                background: var(--sidebar-link-active-bg);
+            }
+
+        /* --- Page Content Styles --- */
+        #content {
+            width: calc(100% - var(--sidebar-width));
+            min-height: 100vh;
+            transition: width 0.35s ease-in-out;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #sidebar.collapsed + #content {
+            width: 100%;
+        }
+
+        .content-header {
+            padding: 0 1.5rem;
+            background: #fff;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,.075);
+            height: var(--header-height);
+            position: sticky;
+            top: 0;
+            z-index: 1020;
+        }
+
+            .content-header .page-title {
+                font-size: 1.5rem;
+                font-weight: 500;
+                margin-bottom: 0;
+            }
+
+        #sidebarCollapse {
+            background: transparent;
+            border: none;
+            color: #343a40;
+            font-size: 1.5rem;
+        }
+
+        .user-info .dropdown-toggle {
+            color: #212529;
+            text-decoration: none;
+        }
+
+            .user-info .dropdown-toggle::after {
+                display: none; /* Hide default arrow */
+            }
+
+        .user-info .dropdown-menu {
+            min-width: auto;
+        }
+
+        .user-info .dropdown-item button {
+            width: 100%;
+            text-align: left;
+        }
+
+
+        .main-content {
+            padding: 1.5rem;
+            flex: 1;
+        }
+
+        .footer {
+            background: var(--content-bg);
+            padding: 1rem 1.5rem;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .content-card {
+            background-color: #fff;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,.075);
+            height: 100%;
+            overflow-x: auto;
+        }
+    </style>
+
+    @RenderSection("Head", required: false)
+    @RenderSection("Styles", required: false)
+</head>
+<body>
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <h3>Service Catalog BGC</h3>
+            </div>
+
+            <ul class="list-unstyled components">
+                <li>
+                    <a class="nav-link" asp-area="" asp-controller="Catalog" asp-action="Index">
+                        <i class="fas fa-home fa-fw me-2"></i> หน้าแรก
+                    </a>
+                </li>
+
+                @if (SignInManager.IsSignedIn(User))
+                {
+                    <li>
+                        <a class="nav-link" asp-area="" asp-controller="Catalog" asp-action="Create">
+                            <i class="fas fa-plus fa-fw me-2"></i> เพิ่มข้อมูล
+                        </a>
+                    </li>
+                }
+
+                @if (User.IsInRole("Admin") || User.IsInRole("SuperAdmin"))
+                {
+                    <li>
+                        <a class="nav-link" asp-controller="AdminUsers" asp-action="Index">
+                            <i class="fas fa-users fa-fw me-2"></i> Users
+                        </a>
+                    </li>
+                }
+            </ul>
+        </nav>
+
+        <!-- Page Content -->
+        <div id="content">
+            <header class="content-header">
+                <div class="d-flex align-items-center">
+                    <button type="button" id="sidebarCollapse" class="me-3">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h2 class="page-title">@ViewData["Title"]</h2>
+                </div>
+                <div class="user-info">
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        <div class="dropdown">
+                            <a href="#" class="d-flex align-items-center dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user-circle fa-fw fa-lg me-2 text-muted"></i>
+                                <span class="fw-bold">@User.Identity.Name</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="userDropdown">
+                                <li class="dropdown-header fst-italic">Your Roles:</li>
+                                @foreach (var claim in User.FindAll(ClaimTypes.Role))
+                                {
+                                    <li><span class="dropdown-item-text">- @claim.Value</span></li>
+                                }
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form class="dropdown-item p-0" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Catalog", new { area = "" })">
+                                        <button type="submit" class="btn btn-link text-dark text-decoration-none w-100 text-start">
+                                            <i class="fas fa-sign-out-alt fa-fw me-2 text-muted"></i>Logout
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    }
+                    else
+                    {
+                        <ul class="navbar-nav flex-row">
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
+                            </li>
+                            <li class="nav-item ms-3">
+                                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
+                            </li>
+                        </ul>
+                    }
+                </div>
+            </header>
+
+            <main class="main-content">
+                <div class="content-card">
+                    @await Html.PartialAsync("_Flash")
+                    @RenderBody()
+                </div>
+            </main>
+
+            <footer class="footer text-muted">
+                &copy; 2568 - ServiceCatalogBGC
+            </footer>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/v/bs5/dt-2.1.5/r-3.0.2/b-3.0.2/b-colvis-3.0.2/datatables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        $(function () {
+            // Sidebar Toggle
+            $('#sidebarCollapse').on('click', function () {
+                $('#sidebar').toggleClass('collapsed');
+                $('#content').toggleClass('collapsed');
+
+                setTimeout(function() {
+                    if ($.fn.dataTable.isDataTable('.table')) {
+                        $($.fn.dataTable.tables(true)).DataTable().columns.adjust();
+                    }
+                }, 360);
+            });
+
+            // Auto-init Select2
+            $('.select2').each(function () {
+                const max = $(this).data('max');
+                $(this).select2({
+                    theme: 'bootstrap-5',
+                    width: '100%',
+                    placeholder: $(this).attr('placeholder') || 'พิมพ์เพื่อค้นหา...',
+                    allowClear: true,
+                    closeOnSelect: false,
+                    maximumSelectionLength: max ? parseInt(max) : 0
+                });
+            });
+
+            // Sidebar Active Link
+            var url = window.location.pathname;
+            var controller = url.split("/")[1] || "Catalog";
+            var action = url.split("/")[2] || "Index";
+
+            $('.nav-link').each(function () {
+                var linkController = $(this).attr('asp-controller');
+                var linkAction = $(this).attr('asp-action');
+
+                if (linkController === controller && (linkAction === action || (linkAction === 'Index' && action === ''))) {
+                    $(this).closest('li').addClass('active');
+                }
+            });
+        });
+    </script>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
+
